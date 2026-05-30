@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: til-board
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/tilboard
+    username: root
+    password: til_board
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    # JPA가 날리는 쿼리 콘솔에서 확인
