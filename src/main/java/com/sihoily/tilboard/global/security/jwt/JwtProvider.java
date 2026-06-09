@@ -24,7 +24,7 @@ public class JwtProvider {
     private final Long accessExpiration;      // 액세스 토큰 기한
     private final Long refreshExpiration;     // 리프레시 토큰 기한
 
-    public record TokenClaims(String userId, String role, LocalDateTime expiredAt) {}
+    public record TokenClaims(String userId, String roles, LocalDateTime expiredAt) {}
 
     public JwtProvider(
             @Value("${jwt.secret}")  String secret,
@@ -40,13 +40,13 @@ public class JwtProvider {
     // ===============================
     //      * Generate Tokens *
     // ===============================
-    public String generateAccessToken(String userId, Role role) {
+    public String generateAccessToken(String userId, String roles) {
         Date now = new Date();
         Date expiration = new Date(now.getTime() + accessExpiration);
         return Jwts.builder()
                 .subject(userId)
                 .claim("type", "access")
-                .claim("role", role.name())
+                .claim("roles", roles)
                 .issuedAt(now)
                 .expiration(expiration)
                 .signWith(secret)
@@ -104,8 +104,8 @@ public class JwtProvider {
     }
 
     // Role 추출
-    public String getRoleNameFromToken(String token) {
-        return getClaims(token).get("role", String.class);
+    public String getRolesFromToken(String token) {
+        return getClaims(token).get("roles", String.class);
     }
 
     // 만료시간 추출
@@ -120,7 +120,7 @@ public class JwtProvider {
         Claims claims = getClaims(token);
         return new TokenClaims(
                 claims.getSubject(),
-                claims.get("role", String.class),
+                claims.get("roles", String.class),
                 claims.getExpiration().toInstant()
                 .atZone(ZoneId.systemDefault())
                 .toLocalDateTime()
