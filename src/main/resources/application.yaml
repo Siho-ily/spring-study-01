@@ -12,3 +12,8 @@ spring:
       ddl-auto: update
     show-sql: true
     # JPA가 날리는 쿼리 콘솔에서 확인
+
+jwt:
+  secret: ${JWT_SECRET}
+  access-expiration: ${JWT_ACCESS_EXPIRATION}
+  refresh-expiration: ${JWT_REFRESH_EXPIRATION}
