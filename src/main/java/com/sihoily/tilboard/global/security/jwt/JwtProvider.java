@@ -1,4 +1,4 @@
-package com.sihoily.tilboard.global.security;
+package com.sihoily.tilboard.global.security.jwt;
 
 import com.sihoily.tilboard.member.domain.Role;
 import io.jsonwebtoken.Claims;
