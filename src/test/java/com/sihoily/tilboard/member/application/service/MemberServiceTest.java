@@ -31,14 +31,15 @@ class MemberServiceTest {
     void testRegisterSuccess() {
         // Given - 옳바른 가입 정보, 중복된 데이터가 없을 때
         String email = "email@example.com";
+        String userId = "test";
         String password = "test1234!";
         String nickname = "nickname";
 
-        Member savedMember = new Member(1L, email, password, nickname, Role.USER);
+        Member savedMember = new Member(1L, userId, email, password, nickname, Role.USER);
         when(saveMemberPort.saveMember(any())).thenReturn(savedMember);
 
         // When - 회원 가입을 요청하면
-        Member result = memberService.register(email, password, nickname);
+        Member result = memberService.register(userId, email, password, nickname);
 
         // Then - 회원가입 성공하고 회원 정보가 반환된다.
         // 결과 값이 맞는지 검증

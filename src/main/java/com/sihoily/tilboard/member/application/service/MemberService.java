@@ -21,8 +21,8 @@ public class MemberService implements LoginUseCase, RegisterMemberUseCase {
     }
 
     @Override
-    public Member register(String email, String password, String nickname) {
-        Member member = new Member(null, email, password, nickname, Role.USER);
+    public Member register(String userId, String email, String password, String nickname) {
+        Member member = new Member(null, userId, email, password, nickname, Role.USER);
         return saveMemberPort.saveMember(member);
     }
 }
