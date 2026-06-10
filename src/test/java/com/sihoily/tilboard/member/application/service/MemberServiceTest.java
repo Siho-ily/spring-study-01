@@ -35,7 +35,7 @@ class MemberServiceTest {
         String password = "test1234!";
         String nickname = "nickname";
 
-        Member savedMember = new Member(1L, userId, email, password, nickname, Role.USER);
+        Member savedMember = new Member(1L, userId, email, password, nickname, Role.USER, null, null);
         when(saveMemberPort.saveMember(any())).thenReturn(savedMember);
 
         // When - 회원 가입을 요청하면

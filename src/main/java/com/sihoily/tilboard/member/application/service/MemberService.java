@@ -22,7 +22,7 @@ public class MemberService implements LoginUseCase, RegisterMemberUseCase {
 
     @Override
     public Member register(String userId, String email, String password, String nickname) {
-        Member member = new Member(null, userId, email, password, nickname, Role.USER);
+        Member member = new Member(null, userId, email, password, nickname, Role.USER, null, null);
         return saveMemberPort.saveMember(member);
     }
 }
