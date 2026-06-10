@@ -1,5 +1,6 @@
 package com.sihoily.tilboard.global.exception.common;
 
+import com.sihoily.tilboard.global.exception.errorCode.ErrorCode;
 import com.sihoily.tilboard.global.response.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -17,16 +18,24 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ApiResponse<Void>> handleException(BusinessException e) {
         log.error(e.getMessage(), e);
+
+        if (e.hasErrors()) {
+            return ResponseEntity
+                    .status(e.getErrorCode().getStatus())
+                    .body(ApiResponse.error(e.getResponseMessage(), e.getErrors()));
+        }
+
         return ResponseEntity
                 .status(e.getErrorCode().getStatus())
-                .body(ApiResponse.error(e.getMessage()));
+                .body(ApiResponse.error(e.getErrorCode(), e.getResponseMessage()));
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleException(Exception e) {
         log.error(e.getMessage(), e);
+        ErrorCode errorCode = ErrorCode.INTERNAL_SERVER_ERROR;
         return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ApiResponse.error("서버 내부 오류가 발생하였습니다. 관리자에게 문의하여 주세요."));
+                .status(errorCode.getStatus())
+                .body(ApiResponse.error(errorCode));
     }
 }
