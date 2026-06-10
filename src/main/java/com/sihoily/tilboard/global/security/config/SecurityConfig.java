@@ -1,5 +1,6 @@
 package com.sihoily.tilboard.global.security.config;
 
+import com.sihoily.tilboard.global.security.jwt.JwtAuthenticationEntryPoint;
 import com.sihoily.tilboard.global.security.jwt.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -16,6 +17,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -33,12 +35,12 @@ public class SecurityConfig {
                 auth.anyRequest().permitAll();  // 일단 다 열어두기
             })
 
-//            // 4. 인증 실패 시 커스텀 EntryPoint 사용
-//            .exceptionHandling(exception -> exception
-//                .authenticationEntryPoint(jwtAuthenticationEntryPoint)
-//            )
-//
-//            // 5. JWT 필터를 UsernamePasswordAuthenticationFilter 앞에 배치
+            // 4. 인증 실패 시 커스텀 EntryPoint 사용
+            .exceptionHandling(exception -> exception
+                .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+            )
+
+            // 5. JWT 필터를 UsernamePasswordAuthenticationFilter 앞에 배치
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

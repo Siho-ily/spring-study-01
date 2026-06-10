@@ -1,5 +1,7 @@
 package com.sihoily.tilboard.global.security.jwt;
 
+import com.sihoily.tilboard.global.exception.security.ExpiredTokenException;
+import com.sihoily.tilboard.global.exception.security.InvalidTokenException;
 import com.sihoily.tilboard.global.security.CustomUserDetails;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -16,7 +18,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -42,13 +43,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (token != null) {
                 authenticateUser(token, request);
             }
-//        } catch (ExpiredTokenException | InvalidTokenException e) {
-//            // 인증 실패 사유를 요청에 남겨두고, 이후 예외 처리 진입점에서 응답을 결정할 수 있게 한다.
-//            log.error("JWT authentication failed: {}", e.getMessage());
-//            request.setAttribute("exception", e);
+        } catch (ExpiredTokenException | InvalidTokenException e) {
+            // 인증 실패 사유를 요청에 남겨두고, 이후 예외 처리 진입점에서 응답을 결정할 수 있게 한다.
+            log.info("Filter: JWT authentication failed: {}", e.getMessage());
+            request.setAttribute("exception", e);
         } catch (Exception e) {
             // JWT 처리 중 예상하지 못한 예외도 동일하게 다음 처리 단계로 넘긴다.
-            log.error("Unexpected error during JWT authentication", e);
+            log.info("Filter: Unexpected error during JWT authentication", e);
             request.setAttribute("exception", e);
         }
 

@@ -1,6 +1,7 @@
 package com.sihoily.tilboard.global.security.jwt;
 
-import com.sihoily.tilboard.member.domain.Role;
+import com.sihoily.tilboard.global.exception.security.ExpiredTokenException;
+import com.sihoily.tilboard.global.exception.security.InvalidTokenException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -77,19 +78,16 @@ public class JwtProvider {
                     .parseSignedClaims(token)
                     .getPayload();
         } catch (io.jsonwebtoken.ExpiredJwtException e) {
-            log.info("만료된 JWT 토큰입니다.", e);
-//            throw new ExpiredTokenException();
+            throw new ExpiredTokenException();
         } catch (JwtException | IllegalArgumentException e) {
-            log.info("유효하지 않은 JWT 토큰입니다.", e);
-//            throw new InvalidTokenException("토큰 형식 또는 서명이 올바르지 않습니다.");
+            throw new InvalidTokenException();
         }
-        log.error("토큰 추출중 에러가 발생하였습니다.");
-        return null;
     }
 
     // 토큰 검증만 진행
     public boolean validateToken(String token) {
-        return getClaims(token) != null;    // null이면 false;
+        getClaims(token);    // null이면 예외가 발생함;
+        return true;
     }
 
     // 리프레시 토큰인지 확인
