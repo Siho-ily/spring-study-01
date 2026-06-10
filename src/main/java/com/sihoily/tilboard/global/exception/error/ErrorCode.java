@@ -1,4 +1,4 @@
-package com.sihoily.tilboard.global.exception.errorCode;
+package com.sihoily.tilboard.global.exception.error;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,9 @@ public enum ErrorCode {
 
     // 회원
     MEMBER_NOT_FOUND("MEMBER-1", HttpStatus.NOT_FOUND, "회원 정보를 찾을 수 없습니다."),
-    MEMBER_CONFLICT("MEMBER-2", HttpStatus.CONFLICT, "회원 정보 충돌 오류가 발생하였습니다."),
+    DUPLICATED_USER_ID("MEMBER-2", HttpStatus.CONFLICT, "이미 사용 중인 아이디입니다."),
+    DUPLICATED_EMAIL("MEMBER-3", HttpStatus.CONFLICT, "이미 사용 중인 이메일입니다."),
+    DUPLICATED_NICKNAME("MEMBER-4", HttpStatus.CONFLICT, "이미 사용 중인 닉네임입니다."),
 
     // 서버
     INTERNAL_SERVER_ERROR("SR-1", HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류가 발생하였습니다.");

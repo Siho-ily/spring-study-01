@@ -6,16 +6,17 @@ import com.sihoily.tilboard.member.application.port.out.LoadMemberPort;
 import com.sihoily.tilboard.member.application.port.out.SaveMemberPort;
 import com.sihoily.tilboard.member.domain.Member;
 import com.sihoily.tilboard.member.domain.Role;
-import com.sihoily.tilboard.global.response.ErrorData;
+import com.sihoily.tilboard.global.exception.error.ErrorCode;
+import com.sihoily.tilboard.global.exception.error.ErrorData;
 import com.sihoily.tilboard.member.exception.MemberConflictException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-@org.springframework.stereotype.Service
+@Service
 @RequiredArgsConstructor
 public class MemberService implements LoginUseCase, SignupUseCase {
     private final PasswordEncoder passwordEncoder;
@@ -34,25 +35,13 @@ public class MemberService implements LoginUseCase, SignupUseCase {
         List<ErrorData> errors = new ArrayList<>();
 
         if (loadMemberPort.existsByUserId(userId)) {
-            errors.add(ErrorData.field(
-                    "DUPLICATED_USER_ID",
-                    "이미 사용 중인 아이디입니다.",
-                    Map.of("field", "userId", "value", userId)
-            ));
+            errors.add(ErrorData.field(ErrorCode.DUPLICATED_USER_ID, "userId", userId));
         }
         if (loadMemberPort.existsByEmail(email)) {
-            errors.add(ErrorData.field(
-                    "DUPLICATED_EMAIL",
-                    "이미 사용 중인 이메일입니다.",
-                    Map.of("field", "email", "value", email)
-            ));
+            errors.add(ErrorData.field(ErrorCode.DUPLICATED_EMAIL, "email", email));
         }
         if (loadMemberPort.existsByNickname(nickname)) {
-            errors.add(ErrorData.field(
-                    "DUPLICATED_NICKNAME",
-                    "이미 사용 중인 닉네임입니다.",
-                    Map.of("field", "nickname", "value", nickname)
-            ));
+            errors.add(ErrorData.field(ErrorCode.DUPLICATED_NICKNAME, "nickname", nickname));
         }
         if (!errors.isEmpty()) {
             throw new MemberConflictException(errors);

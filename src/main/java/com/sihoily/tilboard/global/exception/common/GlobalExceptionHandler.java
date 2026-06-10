@@ -1,9 +1,8 @@
 package com.sihoily.tilboard.global.exception.common;
 
-import com.sihoily.tilboard.global.exception.errorCode.ErrorCode;
+import com.sihoily.tilboard.global.exception.error.ErrorCode;
 import com.sihoily.tilboard.global.response.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -21,12 +20,12 @@ public class GlobalExceptionHandler {
 
         if (e.hasErrors()) {
             return ResponseEntity
-                    .status(e.getErrorCode().getStatus())
+                    .status(e.getStatus())
                     .body(ApiResponse.error(e.getResponseMessage(), e.getErrors()));
         }
 
         return ResponseEntity
-                .status(e.getErrorCode().getStatus())
+                .status(e.getStatus())
                 .body(ApiResponse.error(e.getErrorCode(), e.getResponseMessage()));
     }
 
