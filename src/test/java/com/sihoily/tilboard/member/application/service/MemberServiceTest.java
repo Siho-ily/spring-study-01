@@ -24,7 +24,7 @@ class MemberServiceTest {
     private LoadMemberPort loadMemberPort;
 
     @InjectMocks
-    private Service memberService;
+    private MemberService memberService;
 
     @Test
     @DisplayName("회원가입 성공")

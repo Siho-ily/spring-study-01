@@ -16,7 +16,7 @@ public class ApiResponse<T> {
     public record ErrorData(String type, String field, String message){}
 
     public static <T> ApiResponse<T> success(T data){
-        return new ApiResponse<>(true, "OK", data, null);
+        return new ApiResponse<>(true, "success", data, null);
     }
 
     public static <T> ApiResponse<T> success(String message, T data){
