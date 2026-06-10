@@ -1,7 +1,8 @@
 package com.sihoily.tilboard.global.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.sihoily.tilboard.global.exception.errorCode.ErrorCode;
+import com.sihoily.tilboard.global.exception.error.ErrorCode;
+import com.sihoily.tilboard.global.exception.error.ErrorData;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -29,7 +30,7 @@ public class ApiResponse<T> {
     }
 
     public static ApiResponse<Void> error(ErrorCode errorCode, String message) {
-        ErrorData error = ErrorData.business(errorCode.getCode(), message);
+        ErrorData error = ErrorData.of(errorCode, message);
         return new ApiResponse<>(false, message, null, List.of(error));
     }
 

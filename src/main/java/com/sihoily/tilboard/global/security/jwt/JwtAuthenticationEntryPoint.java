@@ -2,7 +2,7 @@ package com.sihoily.tilboard.global.security.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sihoily.tilboard.global.exception.common.BusinessException;
-import com.sihoily.tilboard.global.exception.errorCode.ErrorCode;
+import com.sihoily.tilboard.global.exception.error.ErrorCode;
 import com.sihoily.tilboard.global.exception.security.ExpiredTokenException;
 import com.sihoily.tilboard.global.exception.security.InvalidTokenException;
 import com.sihoily.tilboard.global.response.ApiResponse;
