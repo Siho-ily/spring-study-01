@@ -1,17 +1,16 @@
 package com.sihoily.tilboard.member.application.service;
 
 import com.sihoily.tilboard.member.application.port.in.LoginUseCase;
-import com.sihoily.tilboard.member.application.port.in.RegisterMemberUseCase;
+import com.sihoily.tilboard.member.application.port.in.SignupUseCase;
 import com.sihoily.tilboard.member.application.port.out.LoadMemberPort;
 import com.sihoily.tilboard.member.application.port.out.SaveMemberPort;
 import com.sihoily.tilboard.member.domain.Member;
 import com.sihoily.tilboard.member.domain.Role;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
-@Service
+@org.springframework.stereotype.Service
 @RequiredArgsConstructor
-public class MemberService implements LoginUseCase, RegisterMemberUseCase {
+public class Service implements LoginUseCase, SignupUseCase {
     private final LoadMemberPort loadMemberPort;
     private final SaveMemberPort saveMemberPort;
 
@@ -21,7 +20,7 @@ public class MemberService implements LoginUseCase, RegisterMemberUseCase {
     }
 
     @Override
-    public Member register(String userId, String email, String password, String nickname) {
+    public Member signup(String userId, String email, String password, String nickname) {
         Member member = new Member(null, userId, email, password, nickname, Role.USER, null, null);
         return saveMemberPort.saveMember(member);
     }
