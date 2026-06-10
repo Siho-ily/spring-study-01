@@ -10,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -22,6 +23,8 @@ class MemberServiceTest {
     private SaveMemberPort saveMemberPort;
     @Mock
     private LoadMemberPort loadMemberPort;
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @InjectMocks
     private MemberService memberService;
@@ -33,9 +36,11 @@ class MemberServiceTest {
         String email = "email@example.com";
         String userId = "test";
         String password = "test1234!";
+        String encodedPassword = "encodedPassword";
         String nickname = "nickname";
 
-        Member savedMember = new Member(1L, userId, email, password, nickname, Role.USER, null, null);
+        Member savedMember = new Member(1L, userId, email, encodedPassword, nickname, Role.USER, null, null);
+        when(passwordEncoder.encode(password)).thenReturn(encodedPassword);
         when(saveMemberPort.saveMember(any())).thenReturn(savedMember);
 
         // When - 회원 가입을 요청하면

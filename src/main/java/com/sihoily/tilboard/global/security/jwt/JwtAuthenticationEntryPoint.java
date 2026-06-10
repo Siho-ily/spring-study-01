@@ -1,6 +1,8 @@
 package com.sihoily.tilboard.global.security.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sihoily.tilboard.global.exception.common.BusinessException;
+import com.sihoily.tilboard.global.exception.errorCode.ErrorCode;
 import com.sihoily.tilboard.global.exception.security.ExpiredTokenException;
 import com.sihoily.tilboard.global.exception.security.InvalidTokenException;
 import com.sihoily.tilboard.global.response.ApiResponse;
@@ -34,19 +36,16 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         // JwtAuthenticationFilter에서 저장한 예외를 꺼낸다
         Exception exception = (Exception) request.getAttribute("exception");
 
-        // 에러 메시지 저장용 변수
-        String errorMessage;
+        ApiResponse<Void> apiResponse;
 
         // 예외 타입에 따라 다른 에러 메시지를 설정
         if (exception instanceof ExpiredTokenException
                 || exception instanceof InvalidTokenException) {
-            errorMessage = exception.getMessage();
+            BusinessException businessException = (BusinessException) exception;
+            apiResponse = ApiResponse.error(businessException.getErrorCode(), businessException.getResponseMessage());
         } else {
-            errorMessage = "Authentication is required to access this resource";
+            apiResponse = ApiResponse.error(ErrorCode.UNAUTHORIZED);
         }
-
-        // ApiResponse 형식으로 에러 응답 생성
-        ApiResponse<Void> apiResponse = ApiResponse.error(errorMessage);
 
         // JSON 응답 반환
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);

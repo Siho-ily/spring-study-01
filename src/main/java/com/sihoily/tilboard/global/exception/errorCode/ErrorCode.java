@@ -14,6 +14,7 @@ public enum ErrorCode {
 
     // 회원
     MEMBER_NOT_FOUND("MEMBER-1", HttpStatus.NOT_FOUND, "회원 정보를 찾을 수 없습니다."),
+    MEMBER_CONFLICT("MEMBER-2", HttpStatus.CONFLICT, "회원 정보 충돌 오류가 발생하였습니다."),
 
     // 서버
     INTERNAL_SERVER_ERROR("SR-1", HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류가 발생하였습니다.");
