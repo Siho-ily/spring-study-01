@@ -18,10 +18,9 @@ public class MemberJpaPersistenceAdapter implements SaveMemberPort, LoadMemberPo
     private final MemberJpaMapper mapper;
 
     @Override
-    public Member loadMember(String userId) {
-        MemberJpaEntity entity = repository.findByUserId(userId)
-                .orElseThrow(() -> new MemberNotFoundException(userId));
-        return mapper.toDomain(entity);
+    public Optional<Member> loadMember(String userId) {
+        return repository.findByUserId(userId)
+                .map(mapper::toDomain);
     }
 
     @Override
