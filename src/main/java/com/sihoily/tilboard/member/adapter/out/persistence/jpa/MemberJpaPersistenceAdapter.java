@@ -25,6 +25,21 @@ public class MemberJpaPersistenceAdapter implements SaveMemberPort, LoadMemberPo
     }
 
     @Override
+    public boolean existsByUserId(String userId) {
+        return repository.existsByUserId(userId);
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return repository.existsByEmail(email);
+    }
+
+    @Override
+    public boolean existsByNickname(String nickname) {
+        return repository.existsByNickname(nickname);
+    }
+
+    @Override
     public Member saveMember(Member member) {
         MemberJpaEntity entity = mapper.toEntity(member);
         MemberJpaEntity savedEntity = repository.save(entity);
