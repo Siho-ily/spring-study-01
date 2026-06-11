@@ -1,7 +1,6 @@
 package com.sihoily.tilboard.global.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.sihoily.tilboard.global.exception.error.ErrorCode;
 import com.sihoily.tilboard.global.exception.error.ErrorData;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,20 +16,14 @@ public class ApiResponse<T> {
     private T data;
     private List<ErrorData> errors;
 
-    public static <T> ApiResponse<T> success(T data) {
-        return new ApiResponse<>(true, "success", data, null);
-    }
-
     public static <T> ApiResponse<T> success(String message, T data) {
         return new ApiResponse<>(true, message, data, null);
     }
 
-    public static ApiResponse<Void> error(ErrorCode errorCode) {
-        return error(errorCode, errorCode.getMessage());
+    public static <T> ApiResponse<T> success(T data) {
+        return new ApiResponse<>(true, "success", data, null);
     }
-
-    public static ApiResponse<Void> error(ErrorCode errorCode, String message) {
-        ErrorData error = ErrorData.of(errorCode, message);
+    public static ApiResponse<Void> error(String message, ErrorData error) {
         return new ApiResponse<>(false, message, null, List.of(error));
     }
 

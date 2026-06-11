@@ -36,7 +36,7 @@ dependencies {
     runtimeOnly 'com.mysql:mysql-connector-j'
 
     // Swagger
-//    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.2'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
 
     // ── QueryDSL (Spring Boot 3.x / Jakarta) ──
     implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'

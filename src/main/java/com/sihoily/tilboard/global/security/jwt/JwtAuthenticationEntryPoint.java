@@ -3,6 +3,7 @@ package com.sihoily.tilboard.global.security.jwt;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sihoily.tilboard.global.exception.common.BusinessException;
 import com.sihoily.tilboard.global.exception.error.ErrorCode;
+import com.sihoily.tilboard.global.exception.error.ErrorData;
 import com.sihoily.tilboard.global.exception.security.ExpiredTokenException;
 import com.sihoily.tilboard.global.exception.security.InvalidTokenException;
 import com.sihoily.tilboard.global.response.ApiResponse;
@@ -17,6 +18,7 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.List;
 
 @Slf4j
 @Component
@@ -42,9 +44,10 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         if (exception instanceof ExpiredTokenException
                 || exception instanceof InvalidTokenException) {
             BusinessException businessException = (BusinessException) exception;
-            apiResponse = ApiResponse.error(businessException.getErrorCode(), businessException.getResponseMessage());
+            apiResponse = ApiResponse.error(businessException.getMessage(), businessException.getErrors());
         } else {
-            apiResponse = ApiResponse.error(ErrorCode.UNAUTHORIZED);
+            ErrorData error = ErrorData.of(ErrorCode.UNAUTHORIZED.getMessage(), null);
+            apiResponse = ApiResponse.error("인증에 실패하였습니다.", error);
         }
 
         // JSON 응답 반환

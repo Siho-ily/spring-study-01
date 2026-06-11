@@ -35,13 +35,13 @@ public class MemberService implements LoginUseCase, SignupUseCase {
         List<ErrorData> errors = new ArrayList<>();
 
         if (loadMemberPort.existsByUserId(userId)) {
-            errors.add(ErrorData.field(ErrorCode.DUPLICATED_USER_ID, "userId", userId));
+            errors.add(ErrorData.field("아이디가 이미 사용중입니다.", "userId", userId));
         }
         if (loadMemberPort.existsByEmail(email)) {
-            errors.add(ErrorData.field(ErrorCode.DUPLICATED_EMAIL, "email", email));
+            errors.add(ErrorData.field("이메일이 이미 사용중입니다.", "email", email));
         }
         if (loadMemberPort.existsByNickname(nickname)) {
-            errors.add(ErrorData.field(ErrorCode.DUPLICATED_NICKNAME, "nickname", nickname));
+            errors.add(ErrorData.field("닉네임이 이미 사용중입니다.", "nickname", nickname));
         }
         if (!errors.isEmpty()) {
             throw new MemberConflictException(errors);

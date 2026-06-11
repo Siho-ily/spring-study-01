@@ -9,44 +9,28 @@ import java.util.List;
 
 @Getter
 public class BusinessException extends RuntimeException {
-    private final ErrorCode errorCode;
     private final HttpStatus status;
-    private final String responseMessage;
+    private final String message;
     private final List<ErrorData> errors;
 
     public BusinessException(ErrorCode errorCode) {
-        super("["+ errorCode.getCode()+"] " + errorCode.getMessage());
-        this.errorCode = errorCode;
+        super(errorCode.getMessage());
         this.status = errorCode.getStatus();
-        this.responseMessage = errorCode.getMessage();
-        this.errors = null;
+        this.message = errorCode.getMessage();
+        this.errors = List.of();
     }
 
-    public BusinessException(ErrorCode errorCode, String message) {
-        super("["+ errorCode.getCode()+"] " + message);
-        this.errorCode = errorCode;
+    public BusinessException(ErrorCode errorCode, ErrorData data) {
+        super(errorCode.getMessage());
         this.status = errorCode.getStatus();
-        this.responseMessage = message;
-        this.errors = null;
+        this.message = errorCode.getMessage();
+        this.errors = List.of(data);
     }
 
-    public BusinessException(ErrorCode errorCode, List<ErrorData> errors) {
-        super("["+ errorCode.getCode()+"] " + errorCode.getMessage());
-        this.errorCode = errorCode;
-        this.status = errorCode.getStatus();
-        this.responseMessage = errorCode.getMessage();
-        this.errors = errors;
-    }
-
-    public BusinessException(HttpStatus status, String message, List<ErrorData> errors) {
+    public BusinessException(ErrorCode errorCode, String message, List<ErrorData> data) {
         super(message);
-        this.errorCode = null;
-        this.status = status;
-        this.responseMessage = message;
-        this.errors = errors;
-    }
-
-    public boolean hasErrors() {
-        return errors != null && !errors.isEmpty();
+        this.status = errorCode.getStatus();
+        this.message = message;
+        this.errors = data;
     }
 }
