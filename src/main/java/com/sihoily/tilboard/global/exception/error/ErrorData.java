@@ -10,6 +10,10 @@ public class ErrorData {
     private final String message;
     private final Object data;
 
+    public static ErrorData of(String message) {
+        return new ErrorData(message, null);
+    }
+
     public static ErrorData of(String message, Object data) {
         return new ErrorData(message, data);
     }
