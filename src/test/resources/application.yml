@@ -9,3 +9,8 @@ spring:
       ddl-auto: create-drop
     database-platform: org.hibernate.dialect.H2Dialect
     show-sql: true
+
+jwt:
+  secret: jwt_secret_test_key_178gfe8wq7g218hro78qewg8qoh2q82t82
+  access-expiration: 1800
+  refresh-expiration: 604800
