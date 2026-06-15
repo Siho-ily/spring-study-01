@@ -13,6 +13,11 @@ public class BusinessException extends RuntimeException {
     private final String message;
     private final List<ErrorData> errors;
 
+
+    // ===================
+    //   * No ErrorData *
+    // ===================
+
     public BusinessException(ErrorCode errorCode) {
         super(errorCode.getMessage());
         this.status = errorCode.getStatus();
@@ -20,11 +25,33 @@ public class BusinessException extends RuntimeException {
         this.errors = List.of();
     }
 
+    // ===================
+    //   * 1 ErrorData *
+    // ===================
+
     public BusinessException(ErrorCode errorCode, ErrorData data) {
         super(errorCode.getMessage());
         this.status = errorCode.getStatus();
         this.message = errorCode.getMessage();
         this.errors = List.of(data);
+    }
+
+    public BusinessException(ErrorCode errorCode, String message, ErrorData data) {
+        super(message);
+        this.status = errorCode.getStatus();
+        this.message = errorCode.getMessage();
+        this.errors = List.of(data);
+    }
+
+    // ===================
+    //  * ErrorDataList *
+    // ===================
+
+    public BusinessException(ErrorCode errorCode, List<ErrorData> data) {
+        super(errorCode.getMessage());
+        this.status = errorCode.getStatus();
+        this.message = errorCode.getMessage();
+        this.errors = data;
     }
 
     public BusinessException(ErrorCode errorCode, String message, List<ErrorData> data) {
