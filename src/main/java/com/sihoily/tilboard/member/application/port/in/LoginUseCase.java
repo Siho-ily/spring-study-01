@@ -1,7 +1,7 @@
 package com.sihoily.tilboard.member.application.port.in;
 
-import com.sihoily.tilboard.member.domain.Member;
+import com.sihoily.tilboard.member.application.result.LoginResult;
 
 public interface LoginUseCase {
-    Member login(String userId, String password);
+    LoginResult login(String userId, String password);
 }

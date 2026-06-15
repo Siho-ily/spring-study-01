@@ -1,14 +1,18 @@
 package com.sihoily.tilboard.member.application.service;
 
+import com.sihoily.tilboard.global.security.jwt.JwtProvider;
 import com.sihoily.tilboard.member.application.port.in.LoginUseCase;
 import com.sihoily.tilboard.member.application.port.in.SignupUseCase;
 import com.sihoily.tilboard.member.application.port.out.LoadMemberPort;
 import com.sihoily.tilboard.member.application.port.out.SaveMemberPort;
+import com.sihoily.tilboard.member.application.result.LoginResult;
 import com.sihoily.tilboard.member.domain.Member;
 import com.sihoily.tilboard.member.domain.Role;
-import com.sihoily.tilboard.global.exception.error.ErrorCode;
 import com.sihoily.tilboard.global.exception.error.ErrorData;
+import com.sihoily.tilboard.member.domain.Token;
 import com.sihoily.tilboard.member.exception.MemberConflictException;
+import com.sihoily.tilboard.member.exception.MemberNotFoundException;
+import com.sihoily.tilboard.member.exception.MemberPasswordVerifyFailed;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,13 +24,28 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MemberService implements LoginUseCase, SignupUseCase {
     private final PasswordEncoder passwordEncoder;
+    private final JwtProvider jwtProvider;
 
     private final LoadMemberPort loadMemberPort;
     private final SaveMemberPort saveMemberPort;
 
     @Override
-    public Member login(String userId, String password) {
-        return null;
+    public LoginResult login(String userId, String password) {
+        // 1. DB 정보 검증
+        Member member = loadMemberPort.loadMember(userId)
+                .orElseThrow(() -> new MemberNotFoundException(userId));
+
+        if (!passwordEncoder.matches(password, member.password())) {
+            throw new MemberPasswordVerifyFailed();
+        }
+
+        // 2. 토큰 발급
+        String accessToken = jwtProvider.generateAccessToken(userId, member.role().name());
+        String refreshToken = jwtProvider.generateRefreshToken(userId);
+        Token token = new Token(accessToken, refreshToken);
+
+        // 3. 응답 구조 변환 및 반환
+        return new LoginResult(member, token);
     }
 
     @Override
