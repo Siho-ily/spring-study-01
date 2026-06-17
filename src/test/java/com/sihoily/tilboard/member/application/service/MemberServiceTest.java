@@ -1,10 +1,14 @@
 package com.sihoily.tilboard.member.application.service;
 
+import com.sihoily.tilboard.global.security.jwt.JwtProvider;
 import com.sihoily.tilboard.member.application.port.out.LoadMemberPort;
 import com.sihoily.tilboard.member.application.port.out.SaveMemberPort;
+import com.sihoily.tilboard.member.application.result.LoginResult;
 import com.sihoily.tilboard.member.domain.Member;
 import com.sihoily.tilboard.member.domain.Role;
 import com.sihoily.tilboard.member.exception.MemberConflictException;
+import com.sihoily.tilboard.member.exception.MemberNotFoundException;
+import com.sihoily.tilboard.member.exception.MemberPasswordVerifyFailed;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -14,9 +18,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -28,6 +35,8 @@ class MemberServiceTest {
     private LoadMemberPort loadMemberPort;
     @Mock
     private PasswordEncoder passwordEncoder;
+    @Mock
+    private JwtProvider jwtProvider;
 
     @InjectMocks
     private MemberService memberService;
@@ -150,13 +159,81 @@ class MemberServiceTest {
         @Nested
         @DisplayName("로그인 성공 케이스")
         class SuccessCase {
+            @Test
+            @DisplayName("로그인 성공")
+            void loginSuccess() {
+                // Given - 옳바른 유저 정보 & DB에 로그인 데이터가 있을 때
+                String userId = "test";
+                String password = "test1234!";
+                String encodedPassword = "encodedPassword";
 
+                Optional<Member> member = Optional.of(
+                        new Member(1L, userId, "test@example.com", encodedPassword, "testname", Role.USER, null, null)
+                );
+
+                when(loadMemberPort.loadMember(any())).thenReturn(member);
+                when(passwordEncoder.matches(eq(password), any(String.class))).thenReturn(true);
+                when(jwtProvider.generateAccessToken(eq(userId), any(String.class))).thenReturn("accesstoken");
+                when(jwtProvider.generateRefreshToken(any(String.class))).thenReturn("refreshtoken");
+
+                // When - 로그인을 요청하면
+                LoginResult result = memberService.login(userId, password);
+
+                // Then - 로그인 유저 정보와 토큰이 담긴 데이터가 반환된다
+                assertThat(result.member().userId()).isEqualTo(userId);
+                assertThat(result.token().accessToken()).isEqualTo("accesstoken");
+                assertThat(result.token().refreshToken()).isEqualTo("refreshtoken");
+
+                verify(loadMemberPort).loadMember(userId);
+                verify(passwordEncoder).matches(eq(password), any(String.class));
+                verify(jwtProvider).generateAccessToken(eq(userId), any(String.class));
+                verify(jwtProvider).generateRefreshToken(userId);
+            }
         }
 
         @Nested
         @DisplayName("로그인 실패 케이스")
         class FailureCase {
+            @Test
+            @DisplayName("회원 정보가 없는 경우 로그인 실패")
+            void loginFailByMemberNotFound() {
+                // Given
+                String userId = "test";
+                String password = "test1234!";
 
+                // When - 회원 정보가 없는 userId로 로그인을 시도하면, 회원 정보가 반환되지 않는다.
+                when(loadMemberPort.loadMember(any(String.class))).thenReturn(Optional.empty());
+
+                // Then
+                assertThatThrownBy(() -> memberService.login(userId, password))
+                        .isInstanceOf(MemberNotFoundException.class);
+
+                verify(loadMemberPort).loadMember(userId);
+            }
+
+            @Test
+            @DisplayName("비밀번호가 일치하지 않는 경우 로그인 실패")
+            void loginFailByPasswordMismatch() {
+                // Given
+                String userId = "test";
+                String password = "test1234!";
+                String encodedPassword = "encodedPassword";
+
+                Optional<Member> member = Optional.of(
+                        new Member(1L, userId, "test@example.com", encodedPassword, "testname", Role.USER, null, null)
+                );
+
+                // When
+                when(loadMemberPort.loadMember(any(String.class))).thenReturn(member);
+                when(passwordEncoder.matches(eq(password), any(String.class))).thenReturn(false);
+
+                // Then
+                assertThatThrownBy(() -> memberService.login(userId, password))
+                    .isInstanceOf(MemberPasswordVerifyFailed.class);
+
+                verify(loadMemberPort).loadMember(userId);
+                verify(passwordEncoder).matches(eq(password), any(String.class));
+            }
         }
     }
 }
