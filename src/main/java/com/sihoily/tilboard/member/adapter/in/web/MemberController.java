@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 //@Validated
-public class MemberController {
+public class MemberController implements MemberControllerDocs {
     private final LoginUseCase loginUseCase;
     private final SignupUseCase signupUseCase;
 
