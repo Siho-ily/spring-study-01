@@ -42,7 +42,7 @@ public class OpenApiConfig {
                         .email("dev@example.com"))
                 .license(new License()
                         .name("Apache 2.0")
-                        .url("<https://www.apache.org/licenses/LICENSE-2.0>"));
+                        .url("https://www.apache.org/licenses/LICENSE-2.0"));
 
         // Step 2: 서버 URL 설정
         Server localServer = new Server()
