@@ -25,7 +25,7 @@ public class JwtProvider {
     private final Long accessExpiration;      // 액세스 토큰 기한
     private final Long refreshExpiration;     // 리프레시 토큰 기한
 
-    public record TokenClaims(String userId, String roles, LocalDateTime expiredAt) {}
+    public record TokenClaims(String userId, String roles, LocalDateTime expiresAt) {}
 
     public JwtProvider(
             @Value("${jwt.secret}")  String secret,
