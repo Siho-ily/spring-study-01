@@ -99,7 +99,7 @@ public class MemberService implements LoginUseCase, SignupUseCase, RefreshTokenU
     }
 
     @Override
-    public Token refreshToken(String refreshToken) {
+    public Token refresh(String refreshToken) {
         LocalDateTime now = LocalDateTime.now();
 
         // 1. 토큰 검증
