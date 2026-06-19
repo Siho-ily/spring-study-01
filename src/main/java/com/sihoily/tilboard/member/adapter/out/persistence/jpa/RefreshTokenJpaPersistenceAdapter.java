@@ -1,6 +1,8 @@
 package com.sihoily.tilboard.member.adapter.out.persistence.jpa;
 
+import com.sihoily.tilboard.member.application.port.out.LoadRefreshTokenPort;
 import com.sihoily.tilboard.member.application.port.out.SaveRefreshTokenPort;
+import com.sihoily.tilboard.member.application.result.RefreshTokenResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
@@ -11,8 +13,9 @@ import java.util.Optional;
 @Slf4j
 @RequiredArgsConstructor
 @Repository
-public class RefreshTokenJpaPersistenceAdapter implements SaveRefreshTokenPort {
+public class RefreshTokenJpaPersistenceAdapter implements SaveRefreshTokenPort, LoadRefreshTokenPort {
     private final RefreshTokenJpaRepository repository;
+
     @Override
     public void saveRefreshToken(String userId, String refreshToken, LocalDateTime expiration) {
         Optional<RefreshTokenJpaEntity> optionalEntity = repository.findByUserId(userId);
@@ -28,4 +31,13 @@ public class RefreshTokenJpaPersistenceAdapter implements SaveRefreshTokenPort {
 
         repository.save(entity);
     }
+
+    @Override
+    public Optional<RefreshTokenResult> loadRefreshToken(String refreshToken) {
+        return repository.findByRefreshToken(refreshToken)
+                .map(entity ->
+                        new RefreshTokenResult(entity.getUserId(), entity.getExpiresAt())
+                );
+    }
+
 }
