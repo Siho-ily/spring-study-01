@@ -31,9 +31,14 @@ public class SecurityConfig {
             )
 
             // 3. 요청별 인가 규칙
-            .authorizeHttpRequests(auth -> {
-                auth.anyRequest().permitAll();  // 일단 다 열어두기
-            })
+
+            .authorizeHttpRequests(auth -> auth
+                // 3-1. 회원가입, 로그인, 재발급 부분만 허용
+                .requestMatchers("/api/auth/*").permitAll()
+
+                // 3-END. 나머지 경로는 모두 차단
+                .anyRequest().authenticated()
+            )
 
             // 4. 인증 실패 시 커스텀 EntryPoint 사용
             .exceptionHandling(exception -> exception

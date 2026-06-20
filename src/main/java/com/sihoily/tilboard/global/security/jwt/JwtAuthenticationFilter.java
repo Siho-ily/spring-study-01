@@ -62,7 +62,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
 
         // JWT 검사를 생략할 부분
-        return path.startsWith("/temp");
+        return path.startsWith("/api/auth");
     }
 
 
