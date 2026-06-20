@@ -1,8 +1,10 @@
 package com.sihoily.tilboard.member.adapter.in.web;
 
 import com.sihoily.tilboard.member.adapter.in.web.dto.request.LoginRequest;
+import com.sihoily.tilboard.member.adapter.in.web.dto.request.RefreshRequest;
 import com.sihoily.tilboard.member.adapter.in.web.dto.request.SignupRequest;
 import com.sihoily.tilboard.member.adapter.in.web.dto.response.LoginResponse;
+import com.sihoily.tilboard.member.adapter.in.web.dto.response.RefreshResponse;
 import com.sihoily.tilboard.member.adapter.in.web.dto.response.SignupResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -167,4 +169,99 @@ public interface MemberControllerDocs {
             )
     })
     ResponseEntity<com.sihoily.tilboard.global.response.ApiResponse<LoginResponse>> login(LoginRequest request);
+
+    @Operation(summary = "리프레시", description = "리프레시 토큰으로 액세스&리프레시 토큰을 재발급 합니다.")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "재발급 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = RefreshResponse.class),
+                            examples = @ExampleObject(
+                                    name = "재발급 성공",
+                                    value = """
+                                            {
+                                              "success": true,
+                                              "message": "success",
+                                              "data": {
+                                                "accessToken": "eyJhbGciOiJIUzI1NiJ9...",
+                                                "refreshToken": "eyJhbGciOiJIUzI1NiJ9..."
+                                              }
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "입력값 검증 실패",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "입력값 검증 실패",
+                                    value = """
+                                            {
+                                              "success": false,
+                                              "message": "요청 필드 검증에 실패하였습니다.",
+                                              "errors": [
+                                                {
+                                                  "message": "refreshToken은 빈 값일 수 없습니다.",
+                                                  "data": {
+                                                    "key": "refreshToken",
+                                                    "value": ""
+                                                  }
+                                                }
+                                              ]
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "유효하지 않거나 만료된 토큰",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "유효하지 않거나 만료된 토큰",
+                                    value = """
+                                            {
+                                              "success": false,
+                                              "message": "인증에 실패하였습니다. 다시 시도하여 주세요.",
+                                              "errors": [
+                                                {
+                                                  "message": "유효하지 않은 토큰입니다.",
+                                                  "data": null
+                                                }
+                                              ]
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "토큰 정보 없음",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "토큰 정보 없음",
+                                    value = """
+                                            {
+                                              "success": false,
+                                              "message": "토큰 정보를 찾을 수 없습니다.",
+                                              "errors": [
+                                                {
+                                                  "message": "리프레시 토큰 정보를 찾을 수 없습니다.",
+                                                  "data": null
+                                                }
+                                              ]
+                                            }
+                                            """
+                            )
+                    )
+            )
+    })
+    ResponseEntity<com.sihoily.tilboard.global.response.ApiResponse<RefreshResponse>> refresh(RefreshRequest request);
 }

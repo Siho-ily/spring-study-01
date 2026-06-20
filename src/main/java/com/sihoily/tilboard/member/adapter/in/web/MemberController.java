@@ -2,13 +2,17 @@ package com.sihoily.tilboard.member.adapter.in.web;
 
 import com.sihoily.tilboard.global.response.ApiResponse;
 import com.sihoily.tilboard.member.adapter.in.web.dto.request.LoginRequest;
+import com.sihoily.tilboard.member.adapter.in.web.dto.request.RefreshRequest;
 import com.sihoily.tilboard.member.adapter.in.web.dto.request.SignupRequest;
 import com.sihoily.tilboard.member.adapter.in.web.dto.response.LoginResponse;
+import com.sihoily.tilboard.member.adapter.in.web.dto.response.RefreshResponse;
 import com.sihoily.tilboard.member.adapter.in.web.dto.response.SignupResponse;
 import com.sihoily.tilboard.member.application.port.in.LoginUseCase;
+import com.sihoily.tilboard.member.application.port.in.RefreshTokenUseCase;
 import com.sihoily.tilboard.member.application.port.in.SignupUseCase;
 import com.sihoily.tilboard.member.application.result.LoginResult;
 import com.sihoily.tilboard.member.domain.Member;
+import com.sihoily.tilboard.member.domain.Token;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 public class MemberController implements MemberControllerDocs {
     private final LoginUseCase loginUseCase;
     private final SignupUseCase signupUseCase;
+    private final RefreshTokenUseCase refreshTokenUseCase;
 
     @PostMapping("/signup")
     public ResponseEntity<ApiResponse<SignupResponse>> signup(
@@ -42,6 +47,17 @@ public class MemberController implements MemberControllerDocs {
     ) {
         LoginResult loginResult = loginUseCase.login(request.getUserId(), request.getPassword());
         LoginResponse response = LoginResponse.from(loginResult);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ApiResponse.success(response));
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<ApiResponse<RefreshResponse>> refresh(
+            @Valid @RequestBody RefreshRequest request
+    ) {
+        Token token = refreshTokenUseCase.refresh(request.getRefreshToken());
+        RefreshResponse response = RefreshResponse.from(token);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(ApiResponse.success(response));
