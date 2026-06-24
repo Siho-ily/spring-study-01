@@ -12,7 +12,10 @@ import com.sihoily.tilboard.post.application.port.in.DeletePostUseCase;
 import com.sihoily.tilboard.post.application.port.in.GetPostUseCase;
 import com.sihoily.tilboard.post.application.port.in.UpdatePostUseCase;
 import com.sihoily.tilboard.post.domain.Post;
+import com.sihoily.tilboard.tag.application.port.in.GetTagsUseCase;
+import com.sihoily.tilboard.tag.domain.Tag;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,6 +35,7 @@ public class PostController implements PostControllerDocs {
     private final GetPostUseCase getPostUseCase;
     private final UpdatePostUseCase updatePostUseCase;
     private final DeletePostUseCase deletePostUseCase;
+    private final GetTagsUseCase getTagsUseCase;
 
     @PostMapping
     public ResponseEntity<ApiResponse<PostResponse>> createPost(
@@ -39,13 +43,14 @@ public class PostController implements PostControllerDocs {
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         Post post = createPostUseCase.createPost(userDetails.getUserId(), request.getTitle(), request.getContent());
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(PostResponse.from(post)));
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(PostResponse.from(post, List.of())));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<PostResponse>> getPost(@PathVariable Long id) {
         Post post = getPostUseCase.getPost(id);
-        return ResponseEntity.ok(ApiResponse.success(PostResponse.from(post)));
+        List<Tag> tags = getTagsUseCase.getTags(id);
+        return ResponseEntity.ok(ApiResponse.success(PostResponse.from(post, tags)));
     }
 
     @GetMapping
@@ -64,7 +69,8 @@ public class PostController implements PostControllerDocs {
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         Post post = updatePostUseCase.updatePost(id, userDetails.getUserId(), request.getTitle(), request.getContent());
-        return ResponseEntity.ok(ApiResponse.success(PostResponse.from(post)));
+        List<Tag> tags = getTagsUseCase.getTags(id);
+        return ResponseEntity.ok(ApiResponse.success(PostResponse.from(post, tags)));
     }
 
     @DeleteMapping("/{id}")
