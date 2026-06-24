@@ -33,10 +33,15 @@ public class SecurityConfig {
             // 3. 요청별 인가 규칙
 
             .authorizeHttpRequests(auth -> auth
-                // 3-1. 회원가입, 로그인, 재발급 부분만 허용
+                // 3-1. 회원가입, 로그인, 재발급
                 .requestMatchers("/api/auth/*").permitAll()
+                // 3-2. Swagger UI
+                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                // 3-3. 게시글·태그 조회는 비인증 허용
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/til", "/api/til/**").permitAll()
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/tags").permitAll()
 
-                // 3-END. 나머지 경로는 모두 차단
+                // 3-END. 나머지 경로는 모두 인증 필요
                 .anyRequest().authenticated()
             )
 
