@@ -15,7 +15,6 @@ import com.sihoily.tilboard.post.domain.Post;
 import com.sihoily.tilboard.tag.application.port.in.GetTagsUseCase;
 import com.sihoily.tilboard.tag.domain.Tag;
 import jakarta.validation.Valid;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +24,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/til")
@@ -42,8 +44,10 @@ public class PostController implements PostControllerDocs {
             @Valid @RequestBody CreatePostRequest request,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        Post post = createPostUseCase.createPost(userDetails.getUserId(), request.getTitle(), request.getContent());
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(PostResponse.from(post, List.of())));
+        Post post = createPostUseCase.createPost(
+                userDetails.getUserId(), request.getTitle(), request.getContent(), request.getTags());
+        List<Tag> tags = getTagsUseCase.getTags(post.id());
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(PostResponse.from(post, tags)));
     }
 
     @GetMapping("/{id}")
@@ -59,7 +63,11 @@ public class PostController implements PostControllerDocs {
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         Page<Post> posts = getPostUseCase.getPosts(keyword, pageable);
-        return ResponseEntity.ok(ApiResponse.success(PageResponse.from(posts.map(PostSummaryResponse::from))));
+        List<Long> postIds = posts.getContent().stream().map(Post::id).toList();
+        Map<Long, List<Tag>> tagsByPostId = getTagsUseCase.getTagsGroupedByPostIds(postIds);
+        Page<PostSummaryResponse> summaries = posts.map(post ->
+                PostSummaryResponse.from(post, tagsByPostId.getOrDefault(post.id(), List.of())));
+        return ResponseEntity.ok(ApiResponse.success(PageResponse.from(summaries)));
     }
 
     @PatchMapping("/{id}")
@@ -68,7 +76,8 @@ public class PostController implements PostControllerDocs {
             @Valid @RequestBody UpdatePostRequest request,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        Post post = updatePostUseCase.updatePost(id, userDetails.getUserId(), request.getTitle(), request.getContent());
+        Post post = updatePostUseCase.updatePost(
+                id, userDetails.getUserId(), request.getTitle(), request.getContent(), request.getTags());
         List<Tag> tags = getTagsUseCase.getTags(id);
         return ResponseEntity.ok(ApiResponse.success(PostResponse.from(post, tags)));
     }

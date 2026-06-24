@@ -2,9 +2,6 @@ package com.sihoily.tilboard.tag.adapter.out.persistence.jpa;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-
-import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -19,12 +16,6 @@ public class TagJpaEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 50)
+    @Column(nullable = false, unique = true, length = 30)
     private String name;
-
-    @Column(nullable = false)
-    private Long postId;
-
-    @CreationTimestamp
-    private LocalDateTime createdAt;
 }

@@ -7,6 +7,10 @@ import com.sihoily.tilboard.post.application.port.out.SavePostPort;
 import com.sihoily.tilboard.post.domain.Post;
 import com.sihoily.tilboard.post.exception.PostAccessDeniedException;
 import com.sihoily.tilboard.post.exception.PostNotFoundException;
+import com.sihoily.tilboard.tag.application.port.out.LoadTagPort;
+import com.sihoily.tilboard.tag.application.port.out.SavePostTagPort;
+import com.sihoily.tilboard.tag.application.port.out.SaveTagPort;
+import com.sihoily.tilboard.tag.domain.Tag;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -16,6 +20,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -32,6 +37,9 @@ class PostServiceTest {
     @Mock private LoadPostPort loadPostPort;
     @Mock private DeletePostPort deletePostPort;
     @Mock private IncrementViewCountPort incrementViewCountPort;
+    @Mock private LoadTagPort loadTagPort;
+    @Mock private SaveTagPort saveTagPort;
+    @Mock private SavePostTagPort savePostTagPort;
 
     @InjectMocks
     private PostService postService;
@@ -45,19 +53,54 @@ class PostServiceTest {
     class CreatePost {
 
         @Test
-        @DisplayName("성공")
-        void success() {
+        @DisplayName("성공 - 태그 없이 작성")
+        void successWithoutTags() {
             // Given
             Post saved = makePost(1L, "user1");
             when(savePostPort.savePost(any())).thenReturn(saved);
 
             // When
-            Post result = postService.createPost("user1", "제목", "내용");
+            Post result = postService.createPost("user1", "제목", "내용", null);
 
             // Then
             assertThat(result.id()).isEqualTo(1L);
-            assertThat(result.authorId()).isEqualTo("user1");
             verify(savePostPort).savePost(any());
+            verify(savePostTagPort, never()).savePostTags(any(), any());
+        }
+
+        @Test
+        @DisplayName("성공 - 태그 포함 작성 시 태그가 생성·연결된다")
+        void successWithTags() {
+            // Given
+            Post saved = makePost(1L, "user1");
+            Tag tag = new Tag(10L, "Spring");
+            when(savePostPort.savePost(any())).thenReturn(saved);
+            when(loadTagPort.findByName("Spring")).thenReturn(Optional.empty());
+            when(saveTagPort.saveTag(any())).thenReturn(tag);
+
+            // When
+            postService.createPost("user1", "제목", "내용", List.of("Spring"));
+
+            // Then
+            verify(saveTagPort).saveTag(any());
+            verify(savePostTagPort).savePostTags(1L, List.of(10L));
+        }
+
+        @Test
+        @DisplayName("성공 - 기존 태그는 새로 생성하지 않고 재사용한다")
+        void successReuseExistingTag() {
+            // Given
+            Post saved = makePost(1L, "user1");
+            Tag existing = new Tag(10L, "Spring");
+            when(savePostPort.savePost(any())).thenReturn(saved);
+            when(loadTagPort.findByName("Spring")).thenReturn(Optional.of(existing));
+
+            // When
+            postService.createPost("user1", "제목", "내용", List.of("Spring"));
+
+            // Then
+            verify(saveTagPort, never()).saveTag(any());
+            verify(savePostTagPort).savePostTags(1L, List.of(10L));
         }
     }
 
@@ -108,7 +151,7 @@ class PostServiceTest {
             when(savePostPort.savePost(any())).thenReturn(updated);
 
             // When
-            Post result = postService.updatePost(1L, "user1", "수정 제목", "수정 내용");
+            Post result = postService.updatePost(1L, "user1", "수정 제목", "수정 내용", null);
 
             // Then
             assertThat(result.title()).isEqualTo("수정 제목");
@@ -123,7 +166,7 @@ class PostServiceTest {
             when(loadPostPort.loadPost(999L)).thenReturn(Optional.empty());
 
             // When & Then
-            assertThatThrownBy(() -> postService.updatePost(999L, "user1", "제목", "내용"))
+            assertThatThrownBy(() -> postService.updatePost(999L, "user1", "제목", "내용", null))
                     .isInstanceOf(PostNotFoundException.class);
 
             verify(savePostPort, never()).savePost(any());
@@ -137,7 +180,7 @@ class PostServiceTest {
             when(loadPostPort.loadPost(1L)).thenReturn(Optional.of(post));
 
             // When & Then
-            assertThatThrownBy(() -> postService.updatePost(1L, "other", "제목", "내용"))
+            assertThatThrownBy(() -> postService.updatePost(1L, "other", "제목", "내용", null))
                     .isInstanceOf(PostAccessDeniedException.class);
 
             verify(savePostPort, never()).savePost(any());

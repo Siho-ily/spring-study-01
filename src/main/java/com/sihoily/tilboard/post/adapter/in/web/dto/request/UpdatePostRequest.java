@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -15,4 +17,6 @@ public class UpdatePostRequest {
     private String title;
     @NotBlank
     private String content;
+    @Size(max = 10)
+    private List<String> tags;
 }

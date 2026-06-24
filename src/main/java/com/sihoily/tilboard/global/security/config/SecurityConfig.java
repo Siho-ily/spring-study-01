@@ -37,8 +37,9 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/*").permitAll()
                 // 3-2. Swagger UI
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                // 3-3. 게시글 조회는 비인증 허용
+                // 3-3. 게시글·태그 조회는 비인증 허용
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/til", "/api/til/**").permitAll()
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/tags").permitAll()
 
                 // 3-END. 나머지 경로는 모두 인증 필요
                 .anyRequest().authenticated()
