@@ -12,9 +12,10 @@ public class PostSummaryResponse {
     private Long id;
     private String title;
     private String authorId;
+    private int viewCount;
     private LocalDateTime createdAt;
 
     public static PostSummaryResponse from(Post post) {
-        return new PostSummaryResponse(post.id(), post.title(), post.authorId(), post.createdAt());
+        return new PostSummaryResponse(post.id(), post.title(), post.authorId(), post.viewCount(), post.createdAt());
     }
 }

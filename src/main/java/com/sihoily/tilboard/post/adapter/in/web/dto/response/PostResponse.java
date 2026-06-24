@@ -13,13 +13,14 @@ public class PostResponse {
     private String title;
     private String content;
     private String authorId;
+    private int viewCount;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
     public static PostResponse from(Post post) {
         return new PostResponse(
                 post.id(), post.title(), post.content(),
-                post.authorId(), post.createdAt(), post.updatedAt()
+                post.authorId(), post.viewCount(), post.createdAt(), post.updatedAt()
         );
     }
 }

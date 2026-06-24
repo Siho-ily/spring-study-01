@@ -28,6 +28,9 @@ public class PostJpaEntity {
     @Column(nullable = false)
     private String authorId;
 
+    @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
+    private int viewCount;
+
     @CreationTimestamp
     private LocalDateTime createdAt;
 

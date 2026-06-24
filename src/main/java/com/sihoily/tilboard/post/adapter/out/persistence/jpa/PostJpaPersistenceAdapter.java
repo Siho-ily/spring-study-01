@@ -1,6 +1,7 @@
 package com.sihoily.tilboard.post.adapter.out.persistence.jpa;
 
 import com.sihoily.tilboard.post.application.port.out.DeletePostPort;
+import com.sihoily.tilboard.post.application.port.out.IncrementViewCountPort;
 import com.sihoily.tilboard.post.application.port.out.LoadPostPort;
 import com.sihoily.tilboard.post.application.port.out.SavePostPort;
 import com.sihoily.tilboard.post.domain.Post;
@@ -15,7 +16,7 @@ import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
-public class PostJpaPersistenceAdapter implements SavePostPort, LoadPostPort, DeletePostPort {
+public class PostJpaPersistenceAdapter implements SavePostPort, LoadPostPort, DeletePostPort, IncrementViewCountPort {
 
     private final PostJpaRepository repository;
     private final PostQueryRepository queryRepository;
@@ -43,6 +44,11 @@ public class PostJpaPersistenceAdapter implements SavePostPort, LoadPostPort, De
     @Override
     public Page<Post> loadPosts(String keyword, Pageable pageable) {
         return queryRepository.findPosts(keyword, pageable).map(mapper::toDomain);
+    }
+
+    @Override
+    public void incrementViewCount(Long id) {
+        repository.incrementViewCount(id);
     }
 
     @Override

@@ -5,6 +5,7 @@ import com.sihoily.tilboard.post.application.port.in.DeletePostUseCase;
 import com.sihoily.tilboard.post.application.port.in.GetPostUseCase;
 import com.sihoily.tilboard.post.application.port.in.UpdatePostUseCase;
 import com.sihoily.tilboard.post.application.port.out.DeletePostPort;
+import com.sihoily.tilboard.post.application.port.out.IncrementViewCountPort;
 import com.sihoily.tilboard.post.application.port.out.LoadPostPort;
 import com.sihoily.tilboard.post.application.port.out.SavePostPort;
 import com.sihoily.tilboard.post.domain.Post;
@@ -25,19 +26,22 @@ public class PostService implements CreatePostUseCase, GetPostUseCase, UpdatePos
     private final SavePostPort savePostPort;
     private final LoadPostPort loadPostPort;
     private final DeletePostPort deletePostPort;
+    private final IncrementViewCountPort incrementViewCountPort;
 
     @Override
     @Transactional
     public Post createPost(String authorId, String title, String content) {
-        Post post = new Post(null, title, content, authorId, null, null, null);
+        Post post = new Post(null, title, content, authorId, 0, null, null, null);
         return savePostPort.savePost(post);
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public Post getPost(Long id) {
-        return loadPostPort.loadPost(id)
+        Post post = loadPostPort.loadPost(id)
                 .orElseThrow(() -> new PostNotFoundException(id));
+        incrementViewCountPort.incrementViewCount(id);
+        return post;
     }
 
     @Override
@@ -56,7 +60,7 @@ public class PostService implements CreatePostUseCase, GetPostUseCase, UpdatePos
             throw new PostAccessDeniedException();
         }
 
-        Post updated = new Post(post.id(), title, content, post.authorId(), post.createdAt(), LocalDateTime.now(), null);
+        Post updated = new Post(post.id(), title, content, post.authorId(), post.viewCount(), post.createdAt(), LocalDateTime.now(), null);
         return savePostPort.savePost(updated);
     }
 

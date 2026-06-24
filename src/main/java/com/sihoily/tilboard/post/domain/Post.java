@@ -7,6 +7,7 @@ public record Post(
         String title,
         String content,
         String authorId,
+        int viewCount,
         LocalDateTime createdAt,
         LocalDateTime updatedAt,
         LocalDateTime deletedAt
