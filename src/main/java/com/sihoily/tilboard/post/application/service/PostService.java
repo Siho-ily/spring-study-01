@@ -11,11 +11,12 @@ import com.sihoily.tilboard.post.domain.Post;
 import com.sihoily.tilboard.post.exception.PostAccessDeniedException;
 import com.sihoily.tilboard.post.exception.PostNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -41,8 +42,8 @@ public class PostService implements CreatePostUseCase, GetPostUseCase, UpdatePos
 
     @Override
     @Transactional(readOnly = true)
-    public List<Post> getPosts(String keyword) {
-        return loadPostPort.loadPosts(keyword);
+    public Page<Post> getPosts(String keyword, Pageable pageable) {
+        return loadPostPort.loadPosts(keyword, pageable);
     }
 
     @Override

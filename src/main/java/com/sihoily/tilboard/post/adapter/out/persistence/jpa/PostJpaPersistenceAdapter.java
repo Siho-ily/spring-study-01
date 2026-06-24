@@ -6,10 +6,11 @@ import com.sihoily.tilboard.post.application.port.out.SavePostPort;
 import com.sihoily.tilboard.post.domain.Post;
 import com.sihoily.tilboard.post.exception.PostNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -40,11 +41,8 @@ public class PostJpaPersistenceAdapter implements SavePostPort, LoadPostPort, De
     }
 
     @Override
-    public List<Post> loadPosts(String keyword) {
-        return queryRepository.findPosts(keyword)
-                .stream()
-                .map(mapper::toDomain)
-                .toList();
+    public Page<Post> loadPosts(String keyword, Pageable pageable) {
+        return queryRepository.findPosts(keyword, pageable).map(mapper::toDomain);
     }
 
     @Override

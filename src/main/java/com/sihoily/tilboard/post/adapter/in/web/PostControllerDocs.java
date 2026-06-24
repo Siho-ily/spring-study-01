@@ -1,6 +1,7 @@
 package com.sihoily.tilboard.post.adapter.in.web;
 
 import com.sihoily.tilboard.global.response.ApiResponse;
+import com.sihoily.tilboard.global.response.PageResponse;
 import com.sihoily.tilboard.global.security.CustomUserDetails;
 import com.sihoily.tilboard.post.adapter.in.web.dto.request.CreatePostRequest;
 import com.sihoily.tilboard.post.adapter.in.web.dto.request.UpdatePostRequest;
@@ -12,11 +13,10 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
-
-import java.util.List;
 
 @Tag(name = "TIL 게시글", description = "TIL 게시글 관련 API")
 public interface PostControllerDocs {
@@ -84,7 +84,7 @@ public interface PostControllerDocs {
     })
     ResponseEntity<ApiResponse<PostResponse>> getPost(@PathVariable Long id);
 
-    @Operation(summary = "게시글 목록 조회", description = "전체 게시글 목록을 조회합니다. keyword로 제목 검색이 가능합니다.")
+    @Operation(summary = "게시글 목록 조회", description = "전체 게시글 목록을 페이지네이션으로 조회합니다. keyword로 제목 검색, page/size로 페이지 지정이 가능합니다.")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "목록 조회 성공",
                     content = @Content(mediaType = "application/json",
@@ -92,14 +92,23 @@ public interface PostControllerDocs {
                                     {
                                       "success": true,
                                       "message": "success",
-                                      "data": [
-                                        { "id": 2, "title": "QueryDSL 정리", "authorId": "myUser123", "createdAt": "2026-06-24T11:00:00" },
-                                        { "id": 1, "title": "오늘 배운 Spring Security", "authorId": "myUser123", "createdAt": "2026-06-24T10:00:00" }
-                                      ]
+                                      "data": {
+                                        "content": [
+                                          { "id": 2, "title": "QueryDSL 정리", "authorId": "myUser123", "createdAt": "2026-06-24T11:00:00" },
+                                          { "id": 1, "title": "오늘 배운 Spring Security", "authorId": "myUser123", "createdAt": "2026-06-24T10:00:00" }
+                                        ],
+                                        "page": 0,
+                                        "size": 10,
+                                        "totalElements": 25,
+                                        "totalPages": 3,
+                                        "hasNext": true,
+                                        "hasPrevious": false
+                                      }
                                     }
                                     """)))
     })
-    ResponseEntity<ApiResponse<List<PostSummaryResponse>>> getPosts(@RequestParam(required = false) String keyword);
+    ResponseEntity<ApiResponse<PageResponse<PostSummaryResponse>>> getPosts(
+            @RequestParam(required = false) String keyword, Pageable pageable);
 
     @Operation(summary = "게시글 수정", description = "본인 게시글을 수정합니다.")
     @ApiResponses({

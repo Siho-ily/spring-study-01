@@ -1,6 +1,7 @@
 package com.sihoily.tilboard.post.adapter.in.web;
 
 import com.sihoily.tilboard.global.response.ApiResponse;
+import com.sihoily.tilboard.global.response.PageResponse;
 import com.sihoily.tilboard.global.security.CustomUserDetails;
 import com.sihoily.tilboard.post.adapter.in.web.dto.request.CreatePostRequest;
 import com.sihoily.tilboard.post.adapter.in.web.dto.request.UpdatePostRequest;
@@ -13,12 +14,14 @@ import com.sihoily.tilboard.post.application.port.in.UpdatePostUseCase;
 import com.sihoily.tilboard.post.domain.Post;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/til")
@@ -46,12 +49,12 @@ public class PostController implements PostControllerDocs {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<PostSummaryResponse>>> getPosts(
-            @RequestParam(required = false) String keyword
+    public ResponseEntity<ApiResponse<PageResponse<PostSummaryResponse>>> getPosts(
+            @RequestParam(required = false) String keyword,
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        List<PostSummaryResponse> posts = getPostUseCase.getPosts(keyword)
-                .stream().map(PostSummaryResponse::from).toList();
-        return ResponseEntity.ok(ApiResponse.success(posts));
+        Page<Post> posts = getPostUseCase.getPosts(keyword, pageable);
+        return ResponseEntity.ok(ApiResponse.success(PageResponse.from(posts.map(PostSummaryResponse::from))));
     }
 
     @PatchMapping("/{id}")

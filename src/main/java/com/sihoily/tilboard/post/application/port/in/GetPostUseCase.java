@@ -1,10 +1,10 @@
 package com.sihoily.tilboard.post.application.port.in;
 
 import com.sihoily.tilboard.post.domain.Post;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface GetPostUseCase {
     Post getPost(Long id);
-    List<Post> getPosts(String keyword);
+    Page<Post> getPosts(String keyword, Pageable pageable);
 }
